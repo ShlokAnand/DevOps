@@ -1,0 +1,57 @@
+pipeline {
+    agent any
+
+    environment {
+        PROJECT_DIR = "C:/Users/Shlok Anand/Desktop/DevOps/task3"
+        PYTHON_ENV  = "C:/Users/Shlok Anand/Desktop/DevOps/task3/venv"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo 'Checking out source code...'
+                checkout scm
+            }
+        }
+
+        stage('Setup Python Environment') {
+            steps {
+                echo 'Setting up Python virtual environment...'
+                bat '''
+                    python -m venv %PYTHON_ENV%
+                    %PYTHON_ENV%\\Scripts\\pip install --upgrade pip
+                    %PYTHON_ENV%\\Scripts\\pip install -r %PROJECT_DIR%\\requirements.txt
+                '''
+            }
+        }
+
+        stage('Run Selenium Tests') {
+            steps {
+                echo 'Running Selenium form tests...'
+                bat '''
+                    %PYTHON_ENV%\\Scripts\\python -u %PROJECT_DIR%\\test_form.py
+                    if %errorlevel% neq 0 (
+                        echo ❌ Tests failed!
+                        exit /b 1
+                    )
+                '''
+            }
+        }
+
+    }
+
+    post {
+        always {
+            echo '🧹 Cleaning up...'
+        }
+
+        success {
+            echo '✅ Pipeline completed successfully! All tests passed.'
+        }
+
+        failure {
+            echo '❌ Pipeline failed. Check the console output above for details.'
+        }
+    }
+}
