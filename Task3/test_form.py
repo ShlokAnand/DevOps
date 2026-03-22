@@ -25,7 +25,7 @@ time.sleep(1)
 
 driver.find_element(By.TAG_NAME,"button").click()
 
-print("✅ TEST PASSED")
+print("TEST PASSED")
 
 time.sleep(3)
 
